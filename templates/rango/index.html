@@ -1,0 +1,21 @@
+{% extends 'rango/base.html' %}
+{% load staticfiles %}
+{% block body_block %}
+{% if user.is_authenticated %}
+<h1>Rango says... hello {{ user.username }}!</h1>
+    <p> visits: {{ visits }}</p>
+{% else %}
+<h1>Rango says... hello world!</h1>
+{% endif %}
+
+{% if categories %}
+    <ul>
+        {% for category in categories %}
+            <!-- Following line changed to add an HTML hyperlink -->
+            <li><a href="{% url 'category' category.slug %}" >{{ category.name }}</a></li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <strong>There are no categories present.</strong>
+{% endif %}
+{% endblock %}
