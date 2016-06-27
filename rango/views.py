@@ -4,11 +4,12 @@ from rango.models import Category, Page
 from rango.forms import CategoryForm, UserForm, UserProfileForm
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect, HttpResponse
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from datetime import datetime
 from rango.bing_search import run_query
 from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+
 
 def index(request):
     category_list = Category.objects.order_by('-likes')[:5]
@@ -115,6 +116,12 @@ def add_category(request):
     # Bad form (or form details), no form supplied...
     # Render the form with error message (if any).
     return render(request, 'rango/add_category.html', {'form': form})
+
+# @login_
+# def add_pages(request):
+#     if request.method == 'POST':
+#         form = CategoryForm(request.POST)
+
 
 
 def register(request):
@@ -228,7 +235,6 @@ def user_logout(request):
     return HttpResponseRedirect('/rango')
 
 
-
 def search(request):
     result_list = []
     if request.method == 'POST':
@@ -256,5 +262,23 @@ def track_url(request):
                 except:
                     pass
 
-    return  redirect(url)
+    return redirect(url)
+
+
+@login_required
+def like_category(request):
+    cat_id = None
+    if request.method == 'GET':
+        cat_id = request.GET['category_id']
+    likes = 0
+    if cat_id:
+        cat = Category.objects.get(id=int(cat_id))
+        if cat:
+            likes = cat.likes + 1
+            cat.likes = likes
+            cat.save()
+
+    return HttpResponse(likes)
+
+
 
